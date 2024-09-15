@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hebrew Translation Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #game-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        input[type="text"] {
+            margin: 10px 0;
+            padding: 5px;
+            width: 200px;
+        }
+        button {
+            margin: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        #feedback {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        #score {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Hebrew Translation Game</h1>
+        <p>Translate the English word to Hebrew:</p>
+        <h2 id="current-word"></h2>
+        <input type="text" id="user-input" placeholder="Enter Hebrew translation">
+        <button id="submit-btn">Submit</button>
+        <p id="feedback"></p>
+        <p id="score">Score: 0</p>
+        <p id="progress">Word 1 of 20</p>
+    </div>
+
+    <script>
+        const words = [
+            // This is a sample of words and translations. You'll need to add the complete list here.
+            {en: "addition", he: "תוספת"},
+            {en: "advance", he: "מתקדם"},
+            {en: "advanced", he: "מתקדם"},
+            {en: "advertising", he: "פרסום"},
+            {en: "appear", he: "להופיע"},
+            {en: "approach", he: "גישה"},
+            {en: "as", he: "כמו"},
+            {en: "at least", he: "לפחות"},
+            {en: "be responsible for", he: "להיות אחראי ל"},
+            {en: "before", he: "לפני"},
+            // Add more words here...
+        ];
+
+        let currentWords = [];
+        let currentWordIndex = 0;
+        let score = 0;
+
+        const currentWordElement = document.getElementById('current-word');
+        const userInputElement = document.getElementById('user-input');
+        const submitButton = document.getElementById('submit-btn');
+        const feedbackElement = document.getElementById('feedback');
+        const scoreElement = document.getElementById('score');
+        const progressElement = document.getElementById('progress');
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startGame() {
+            shuffleArray(words);
+            currentWords = words.slice(0, 20);
+            currentWordIndex = 0;
+            score = 0;
+            showNextWord();
+        }
+
+        function showNextWord() {
+            if (currentWordIndex < currentWords.length) {
+                currentWordElement.textContent = currentWords[currentWordIndex].en;
+                userInputElement.value = '';
+                feedbackElement.textContent = '';
+                progressElement.textContent = `Word ${currentWordIndex + 1} of 20`;
+            } else {
+                endGame();
+            }
+        }
+
+        function checkAnswer() {
+            const userAnswer = userInputElement.value.trim().toLowerCase();
+            const correctAnswer = currentWords[currentWordIndex].he.toLowerCase();
+            
+            if (isPartiallyCorrect(userAnswer, correctAnswer)) {
+                score += 5;
+                feedbackElement.textContent = "Correct! +5 points";
+                feedbackElement.style.color = "green";
+            } else {
+                feedbackElement.textContent = `Incorrect. The correct answer is: ${correctAnswer}`;
+                feedbackElement.style.color = "red";
+            }
+
+            scoreElement.textContent = `Score: ${score}`;
+            currentWordIndex++;
+            setTimeout(showNextWord, 1500);
+        }
+
+        function isPartiallyCorrect(userAnswer, correctAnswer) {
+            // This is a simple implementation. You might want to enhance it for better partial matching.
+            return userAnswer === correctAnswer || correctAnswer.includes(userAnswer) || userAnswer.includes(correctAnswer);
+        }
+
+        function endGame() {
+            currentWordElement.textContent = "Game Over!";
+            userInputElement.style.display = "none";
+            submitButton.style.display = "none";
+            feedbackElement.textContent = `Final Score: ${score} out of 100`;
+            progressElement.textContent = "";
+        }
+
+        submitButton.addEventListener('click', checkAnswer);
+        userInputElement.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        startGame();
+    </script>
+</body>
+</html>
